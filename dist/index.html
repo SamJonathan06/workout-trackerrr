@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <!-- Fonts and Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Exact CSS from the netlify app */
+        :root{--bg:#09090b;--surface:#18181b;--primary:#c084fc;--primary-hover:#d8b4fe;--accent:#f472b6;--text:#f4f4f5;--text-secondary:#a1a1aa;--border:#27272a;--danger:#f43f5e;--success:#10b981;--radius:24px;--shadow:0 10px 40px -10px #000000b3;--glow:0 0 20px #c084fc66}
+        *{box-sizing:border-box;margin:0;padding:0;font-family:Space Grotesk,sans-serif!important}
+        ::-webkit-scrollbar{display:none}
+        body,input,button,select,textarea{letter-spacing:.2px;font-variant-numeric:tabular-nums!important}
+        h1,h2,h3,h4,h5,h6,.header h1{letter-spacing:1px;font-family:Orbitron,Space Grotesk,sans-serif!important}
+        body{background-color:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-ms-overflow-style:none;scrollbar-width:none;background-image:url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='2'%3E%3Cg transform='translate(40, 40) rotate(45)'%3E%3Crect x='-15' y='-5' width='30' height='10' rx='2' /%3E%3Crect x='-25' y='-15' width='10' height='30' rx='3' /%3E%3Crect x='15' y='-15' width='10' height='30' rx='3' /%3E%3Crect x='-30' y='-10' width='5' height='20' rx='1' /%3E%3Crect x='25' y='-10' width='5' height='20' rx='1' /%3E%3C/g%3E%3Cpath d='M 130 50 L 145 50 L 150 40 L 160 70 L 165 50 L 180 50' fill='none' /%3E%3Cg transform='translate(160, 160)'%3E%3Ccircle cx='0' cy='0' r='20' fill='none' stroke-width='4' /%3E%3Ccircle cx='0' cy='0' r='5' fill='none' /%3E%3Ccircle cx='0' cy='0' r='25' fill='none' stroke-dasharray='4 4' /%3E%3C/g%3E%3Cg transform='translate(50, 160)'%3E%3Ccircle cx='0' cy='5' r='12' /%3E%3Cpath d='M -6 -5 C -6 -18, 6 -18, 6 -5' fill='none' stroke-width='3' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),radial-gradient(circle at 15%,#c084fc14,#0000 25%),radial-gradient(circle at 85% 30%,#f472b614,#0000 25%);background-attachment:fixed}
+        .app-container{max-width:1000px;min-height:100vh;margin:0 auto;padding-bottom:100px;position:relative}
+        .dashboard-grid{grid-template-columns:1fr;gap:20px;display:grid}
+        @media (width>=768px){.dashboard-grid{grid-template-columns:1fr 1fr;align-items:start}}
+        .header{-webkit-backdrop-filter:blur(16px);z-index:10;background-color:#09090bcc;border-bottom:1px solid #ffffff0d;padding:30px 20px 20px;position:sticky;top:0}
+        .header h1{color:#fff;text-shadow:0 0 10px #ffffffb3, 0 0 20px var(--primary), 0 0 30px var(--primary);font-size:34px;font-weight:800}
+        .content{padding:10px 20px}
+        .card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #ffffff08;margin-bottom:20px;padding:24px;transition:transform .3s,box-shadow .3s,z-index 0s;position:relative;z-index:1}
+        .card:hover{transform:translateY(-2px);box-shadow:0 15px 50px -15px #000000e6;z-index:10}
+        .card:focus-within{z-index:50}
+        .card h3{margin-bottom:14px;font-size:22px;font-weight:700}
+        .btn{cursor:pointer;border:none;border-radius:16px;justify-content:center;align-items:center;width:100%;padding:16px 24px;font-size:16px;font-weight:700;transition:all .2s;display:inline-flex}
+        .btn:active{transform:scale(.94)}
+        .btn-primary{background:linear-gradient(135deg, var(--primary), var(--accent));color:#fff;box-shadow:var(--glow)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px #c084fc99}
+        .btn-success{background-color:var(--success);color:#000}
+        .btn-danger{color:var(--danger);background-color:#f43f5e1a;border:1px solid #f43f5e33}
+        .btn-secondary{color:var(--text);background-color:#ffffff0d;border:1px solid #ffffff14}
+        .btn-secondary:hover{background-color:#ffffff1a}
+        .btn-icon{width:auto;padding:12px 18px;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1)}
+        .btn-icon:hover{transform:scale(1.15) translateY(-2px);background-color:rgba(255,255,255,0.15)!important;filter:brightness(1.2);box-shadow:0 5px 15px rgba(0,0,0,0.3)}
+        .input{border:1px solid var(--border);width:100%;color:var(--text);background-color:#0003;border-radius:16px;outline:none;margin-bottom:16px;padding:16px 20px;font-size:16px;transition:all .3s}
+        .input:focus{border-color:var(--primary);background-color:#c084fc0d;box-shadow:0 0 0 4px #c084fc1a}
+        .input:hover svg{color:var(--primary);transform:scale(1.1)}
+        .row{align-items:center;gap:12px;margin-bottom:12px;display:flex}
+        .flex-between{justify-content:space-between;align-items:center;display:flex}
+        .bottom-nav{-webkit-backdrop-filter:blur(20px);z-index:100;background-color:#18181bd9;border:1px solid #ffffff14;border-radius:30px;max-width:400px;padding:8px 16px;display:flex;position:fixed;bottom:20px;left:50%;transform:translate(-50%);box-shadow:0 20px 40px #00000080}
+        .nav-item{color:#f4f4f5;cursor:pointer;background:0 0;border:none;border-radius:20px;flex-direction:column;justify-content:center;align-items:center;gap:6px;font-size:11px;font-weight:700;transition:all .3s;display:flex;position:relative;padding:10px 16px;}
+        .nav-item:hover{color:var(--primary-hover);background-color:rgba(192,132,252,0.15)}
+        .nav-item:after{content:"";background-color:var(--primary);opacity:0;border-radius:50%;width:4px;height:4px;transition:opacity .3s;position:absolute;bottom:-4px}
+        .nav-item.active{color:#fff;text-shadow:0 0 12px #ffffffe6, 0 0 20px var(--primary);background-color:#c084fc1a}
+        .nav-item.active:after{opacity:1}
+        .nav-item svg, .nav-item i{font-size:24px;width:24px;height:24px;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1)}
+        .nav-item:hover svg, .nav-item:hover i{transform:translateY(-4px) scale(1.15);filter:drop-shadow(0 4px 6px rgba(192,132,252,0.6))}
+        .badge{color:var(--primary);background-color:#c084fc26;border:1px solid #c084fc33;border-radius:12px;padding:6px 12px;font-size:12px;font-weight:700}
+        @keyframes slideLeftEnter{0%{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes slideRightEnter{0%{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+        .animate-slide-left{animation: slideLeftEnter 0.3s forwards}
+        .animate-slide-right{animation: slideRightEnter 0.3s forwards}
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const defaultExercises = [
+            {id: '1', name: 'Bench Press', category: 'Chest'},
+            {id: '2', name: 'Squat', category: 'Legs'},
+            {id: '3', name: 'Pull-ups', category: 'Back'},
+            {id: '4', name: 'Deadlift', category: 'Back'},
+            {id: '5', name: 'Overhead Press', category: 'Shoulders'}
+        ];
+        const defaultCategories = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
+
+        const CustomSelect = ({options, value, onChange}) => {
+            const [open, setOpen] = useState(false);
+            return (
+                <div style={{position:'relative', marginBottom:'16px', outline:'none'}} tabIndex={0} onBlur={() => setTimeout(() => setOpen(false), 150)}>
+                    <div className="input" style={{cursor:'pointer', marginBottom:0, display:'flex', justifyContent:'space-between', alignItems:'center'}} onClick={() => setOpen(!open)}>
+                        <span>{value}</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{transform: open ? 'rotate(180deg)' : 'none', transition: '0.3s'}}><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    {open && (
+                        <div style={{position:'absolute', top:'100%', left:0, right:0, zIndex:100, backgroundColor:'#27272a', borderRadius:'12px', border:'1px solid var(--primary)', marginTop:'8px', overflow:'hidden', boxShadow:'0 10px 30px rgba(0,0,0,0.5)'}}>
+                            {options.map(opt => (
+                                <div key={opt} style={{padding:'12px 20px', cursor:'pointer', backgroundColor: value === opt ? 'rgba(192,132,252,0.2)' : 'transparent', color: '#fff', transition: 'background-color 0.2s'}} onClick={() => {onChange(opt); setOpen(false);}} onMouseEnter={e => e.currentTarget.style.backgroundColor='var(--primary)'} onMouseLeave={e => e.currentTarget.style.backgroundColor=value===opt?'rgba(192,132,252,0.2)':'transparent'}>
+                                    {opt}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [slideDir, setSlideDir] = useState('left');
+            const [exercises, setExercises] = useState(() => {
+                const saved = localStorage.getItem('wt_exercises');
+                return saved ? JSON.parse(saved) : defaultExercises;
+            });
+            const [categories, setCategories] = useState(() => {
+                const saved = localStorage.getItem('wt_categories');
+                return saved ? JSON.parse(saved) : defaultCategories;
+            });
+            const [history, setHistory] = useState(() => {
+                const saved = localStorage.getItem('wt_history');
+                return saved ? JSON.parse(saved) : [];
+            });
+            const [activeWorkout, setActiveWorkout] = useState(() => {
+                const saved = localStorage.getItem('wt_active');
+                return saved ? JSON.parse(saved) : null;
+            });
+
+            const [finishModal, setFinishModal] = useState(false);
+            const [cancelModal, setCancelModal] = useState(false);
+            const [intensity, setIntensity] = useState(3);
+            const [notes, setNotes] = useState('');
+            const [height, setHeight] = useState(() => localStorage.getItem('wt_height') ? Number(localStorage.getItem('wt_height')) : '');
+            const [weight, setWeight] = useState(() => localStorage.getItem('wt_weight') ? Number(localStorage.getItem('wt_weight')) : '');
+
+            const [newExName, setNewExName] = useState('');
+            const [newExCat, setNewExCat] = useState('Chest');
+            const [newCatName, setNewCatName] = useState('');
+            const [editingEx, setEditingEx] = useState(null);
+
+            useEffect(() => {
+                if(categories.length > 0 && !categories.includes(newExCat)) setNewExCat(categories[0]);
+            }, [categories]);
+
+            useEffect(() => { localStorage.setItem('wt_exercises', JSON.stringify(exercises)); }, [exercises]);
+            useEffect(() => { localStorage.setItem('wt_categories', JSON.stringify(categories)); }, [categories]);
+            useEffect(() => { localStorage.setItem('wt_history', JSON.stringify(history)); }, [history]);
+            useEffect(() => {
+                if (activeWorkout) localStorage.setItem('wt_active', JSON.stringify(activeWorkout));
+                else localStorage.removeItem('wt_active');
+            }, [activeWorkout]);
+
+            const tabs = ['home', 'workout', 'exercises', 'history'];
+            const switchTab = (tab) => {
+                if (activeTab === tab) return;
+                const currentIndex = tabs.indexOf(activeTab);
+                const nextIndex = tabs.indexOf(tab);
+                setSlideDir(nextIndex > currentIndex ? 'left' : 'right');
+                setActiveTab(tab);
+            };
+
+            const startWorkout = () => {
+                setActiveWorkout([]);
+                switchTab('workout');
+            };
+
+            const addExercise = (id) => {
+                setActiveWorkout([...(activeWorkout||[]), {exerciseId: id, sets: [{weight: '', reps: '', completed: false}]}]);
+            };
+
+            const updateSet = (eIndex, sIndex, field, val) => {
+                const updated = [...(activeWorkout||[])];
+                updated[eIndex].sets[sIndex] = { ...updated[eIndex].sets[sIndex], [field]: val };
+                setActiveWorkout(updated);
+            };
+
+            const addSet = (eIndex) => {
+                const updated = [...(activeWorkout||[])];
+                updated[eIndex].sets.push({weight: '', reps: '', completed: false});
+                setActiveWorkout(updated);
+            };
+
+            const addWarmup = (eIndex) => {
+                const updated = [...(activeWorkout||[])];
+                updated[eIndex].sets.push({weight: '', reps: '', completed: false, isWarmup: true});
+                setActiveWorkout(updated);
+            };
+
+            const removeSet = (eIndex, sIndex) => {
+                const updated = [...(activeWorkout||[])];
+                updated[eIndex].sets.splice(sIndex, 1);
+                setActiveWorkout(updated);
+            };
+
+            const removeExercise = (eIndex) => {
+                if(confirm('Remove this exercise from your workout?')) {
+                    const updated = [...(activeWorkout||[])];
+                    updated.splice(eIndex, 1);
+                    setActiveWorkout(updated);
+                }
+            };
+
+            const saveWorkout = () => {
+                if(!activeWorkout) return;
+                if(height) localStorage.setItem('wt_height', height.toString());
+                if(weight) localStorage.setItem('wt_weight', weight.toString());
+                
+                let bmi;
+                let feedback = '';
+                if (height && weight) {
+                    const hM = Number(height) / 100;
+                    bmi = Number(weight) / (hM * hM);
+                    let vol = 0;
+                    activeWorkout.forEach(e => {
+                        e.sets.forEach(s => {
+                            if(s.completed && !s.isWarmup && s.weight && s.reps) {
+                                vol += Number(s.weight) * Number(s.reps);
+                            }
+                        });
+                    });
+                    let rank = 'average';
+                    if (vol > 5000) rank = 'top 5%';
+                    else if (vol > 3000) rank = 'top 20%';
+                    else if (vol > 1500) rank = 'top 50%';
+                    feedback = `With a BMI of ${bmi.toFixed(1)}, lifting a total volume of ${vol} kg at intensity ${intensity}/5 places your performance in the ${rank} of the world population for this activity level.`;
+                }
+
+                setHistory([{
+                    id: Date.now().toString(),
+                    date: new Date().toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'}),
+                    intensity,
+                    rating: 5,
+                    notes,
+                    exercises: activeWorkout,
+                    feedback,
+                    userHeight: height === '' ? undefined : Number(height),
+                    userWeight: weight === '' ? undefined : Number(weight),
+                    userBmi: bmi
+                }, ...history]);
+
+                setActiveWorkout(null);
+                setFinishModal(false);
+                setIntensity(3);
+                setNotes('');
+                switchTab('history');
+            };
+
+            return (
+                <div className="app-container">
+                    <div className="header" style={{textAlign:'center'}}>
+                        <h1>{activeTab === 'home' ? 'Dashboard' : activeTab === 'workout' ? 'Active Session' : activeTab === 'exercises' ? 'Library' : 'History'}</h1>
+                    </div>
+                    
+                    <div style={{position:'relative', width:'100%', overflowX:'hidden', minHeight:'80vh'}}>
+                        {/* HOME */}
+                        {activeTab === 'home' && (
+                            <div className={`content animate-slide-${slideDir}`}>
+                                <div style={{maxWidth:'600px', margin:'0 auto'}}>
+                                    <div className="card" style={{background:'linear-gradient(135deg, rgba(192,132,252,0.1), rgba(244,114,182,0.1))', border:'1px solid rgba(192,132,252,0.2)'}}>
+                                        <h2 style={{fontSize:'28px', marginBottom:'8px', color:'var(--text)', fontWeight:800}}>Ready to crush it?</h2>
+                                        <p style={{color:'var(--text-secondary)', marginBottom:'24px', fontSize:'15px'}}>You've completed <strong style={{color:'var(--primary)'}}>{history.length}</strong> workouts so far.</p>
+                                        <button className="btn btn-primary" onClick={startWorkout}>{activeWorkout ? 'Resume Workout' : 'Start New Workout'}</button>
+                                    </div>
+                                    <div className="flex-between" style={{margin:'30px 0 15px'}}>
+                                        <h3 style={{margin:0, color:'var(--text)', fontSize:'20px'}}>Recent Activity</h3>
+                                    </div>
+                                    {history.length === 0 ? (
+                                        <p style={{color:'var(--text-secondary)', textAlign:'center', marginTop:'20px'}}>No recent activity to show.</p>
+                                    ) : (
+                                        history.slice(0, 5).map(h => (
+                                            <div key={h.id} className="card" style={{padding:'20px'}}>
+                                                <div className="flex-between">
+                                                    <div style={{display:'flex', flexDirection:'column', gap:'4px'}}>
+                                                        <strong style={{fontSize:'16px'}}>{h.date}</strong>
+                                                        <span style={{fontSize:'13px', color:'var(--text-secondary)'}}>Intensity: {h.intensity}/5</span>
+                                                    </div>
+                                                    <span className="badge">{h.exercises.length} Exercises</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* WORKOUT */}
+                        {activeTab === 'workout' && (
+                            activeWorkout ? (
+                                cancelModal ? (
+                                    <div className={`content animate-slide-${slideDir}`}>
+                                        <div className="card" style={{maxWidth:'400px', margin:'40px auto', textAlign:'center'}}>
+                                            <h3 style={{color:'var(--danger)', marginBottom:'16px', fontSize:'20px'}}>Cancel Workout?</h3>
+                                            <p style={{color:'var(--text-secondary)', marginBottom:'24px'}}>Are you sure you want to cancel this workout? All progress will be lost.</p>
+                                            <div style={{display:'flex', gap:'10px'}}>
+                                                <button className="btn btn-secondary" style={{flex:1}} onClick={() => setCancelModal(false)}>No, Resume</button>
+                                                <button className="btn btn-danger" style={{flex:1}} onClick={() => {setCancelModal(false); setActiveWorkout(null); switchTab('home');}}>Yes, Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : finishModal ? (
+                                    <div className={`content animate-slide-${slideDir}`}>
+                                        <div className="card">
+                                            <h3>Finish Workout</h3>
+                                            <p style={{marginBottom:'16px', color:'var(--text-secondary)'}}>How did it feel?</p>
+                                            <div style={{display:'flex', gap:'10px', marginBottom:'24px'}}>
+                                                {[1,2,3,4,5].map(lvl => (
+                                                    <button key={lvl} onClick={() => setIntensity(lvl)} className="btn" style={{padding:'12px', flex:1, backgroundColor: intensity === lvl ? 'var(--primary)' : 'rgba(255,255,255,0.05)', color: intensity === lvl ? '#fff' : 'var(--text)', border: intensity === lvl ? 'none' : '1px solid rgba(255,255,255,0.1)'}}>{lvl}</button>
+                                                ))}
+                                            </div>
+                                            <div style={{display:'flex', gap:'10px', marginBottom:'16px'}}>
+                                                <div style={{flex:1}}>
+                                                    <label style={{fontSize:'12px', color:'var(--text-secondary)', marginBottom:'4px', display:'block'}}>Height (cm)</label>
+                                                    <input type="number" className="input" placeholder="e.g. 180" value={height} onChange={e => setHeight(e.target.value === '' ? '' : Number(e.target.value))} />
+                                                </div>
+                                                <div style={{flex:1}}>
+                                                    <label style={{fontSize:'12px', color:'var(--text-secondary)', marginBottom:'4px', display:'block'}}>Weight (kg)</label>
+                                                    <input type="number" className="input" placeholder="e.g. 80" value={weight} onChange={e => setWeight(e.target.value === '' ? '' : Number(e.target.value))} />
+                                                </div>
+                                            </div>
+                                            <textarea className="input" placeholder="Workout notes..." rows="4" value={notes} onChange={e => setNotes(e.target.value)}></textarea>
+                                            <button className="btn btn-primary" onClick={saveWorkout} style={{marginBottom:'12px'}}>Save Workout</button>
+                                            <button className="btn btn-secondary" onClick={() => setFinishModal(false)}>Cancel</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`content animate-slide-${slideDir}`}>
+                                        <div className="flex-between" style={{marginBottom:'24px'}}>
+                                            <button className="btn btn-danger btn-icon" onClick={() => setCancelModal(true)}>Cancel</button>
+                                            <button className="btn btn-success btn-icon" onClick={() => setFinishModal(true)}>Finish</button>
+                                        </div>
+                                        <div className="dashboard-grid">
+                                            <div>
+                                                {activeWorkout.map((ex, eIndex) => {
+                                                    const exInfo = exercises.find(e => e.id === ex.exerciseId) || {name: 'Unknown'};
+                                                    const prevEx = history.find(h => h.exercises.some(e => e.exerciseId === ex.exerciseId))?.exercises.find(e => e.exerciseId === ex.exerciseId);
+                                                    const prevWarmups = prevEx?.sets.filter(s => s.isWarmup) || [];
+                                                    const prevNormal = prevEx?.sets.filter(s => !s.isWarmup) || [];
+                                                    let wIdx = 0, nIdx = 0;
+
+                                                    return (
+                                                        <div key={eIndex} className="card">
+                                                            <div className="flex-between" style={{marginBottom:'16px'}}>
+                                                                <h3 style={{color:'var(--primary)', margin:0}}>{exInfo.name}</h3>
+                                                                <button className="btn btn-icon" style={{width:'auto', padding:'6px 12px', background:'transparent', border:'1px solid rgba(244,63,94,0.3)', color:'var(--danger)', fontSize:'12px'}} onClick={() => removeExercise(eIndex)}>
+                                                                    <i className="fas fa-trash"></i> Remove
+                                                                </button>
+                                                            </div>
+                                                            <div className="row" style={{color:'var(--text-secondary)', fontSize:'11px', fontWeight:800, paddingLeft:'5px', letterSpacing:'1px'}}>
+                                                                <span style={{width:'40px'}}>SET</span>
+                                                                <span style={{flex:1}}>KG</span>
+                                                                <span style={{flex:1}}>REPS</span>
+                                                                <span style={{width:'45px', textAlign:'center'}}>DONE</span>
+                                                                <span style={{width:'35px'}}></span>
+                                                            </div>
+                                                            {ex.sets.map((set, sIndex) => {
+                                                                let prevSet = null;
+                                                                if (set.isWarmup) { prevSet = prevWarmups[wIdx]; wIdx++; }
+                                                                else { prevSet = prevNormal[nIdx]; nIdx++; }
+
+                                                                let wColor = '', rColor = '';
+                                                                if(prevSet && set.weight !== '') {
+                                                                    if(Number(set.weight) > Number(prevSet.weight)) wColor = 'var(--success)';
+                                                                    else if(Number(set.weight) < Number(prevSet.weight)) wColor = 'var(--danger)';
+                                                                }
+                                                                if(prevSet && set.reps !== '') {
+                                                                    if(Number(set.reps) > Number(prevSet.reps)) rColor = 'var(--success)';
+                                                                    else if(Number(set.reps) < Number(prevSet.reps)) rColor = 'var(--danger)';
+                                                                }
+
+                                                                return (
+                                                                    <div key={sIndex} className="row" style={{backgroundColor: set.completed ? 'rgba(16, 185, 129, 0.1)' : set.isWarmup ? 'rgba(234, 179, 8, 0.1)' : 'transparent', padding:'8px', borderRadius:'12px', border: set.completed ? '1px solid rgba(16, 185, 129, 0.2)' : set.isWarmup ? '1px solid rgba(234, 179, 8, 0.2)' : '1px solid transparent', transition:'all 0.3s ease'}}>
+                                                                        <span style={{width:'40px', fontWeight:'bold', color: set.completed ? 'var(--success)' : set.isWarmup ? '#eab308' : 'var(--text-secondary)', textAlign:'center'}}>{set.isWarmup ? 'W' : (nIdx + 1)}</span>
+                                                                        <input type="number" className="input" style={{marginBottom:0, flex:1, height:'45px', padding:'10px', color:wColor}} placeholder={prevSet ? `Prev: ${prevSet.weight}` : '0'} value={set.weight} onChange={e => updateSet(eIndex, sIndex, 'weight', e.target.value === '' ? '' : Number(e.target.value))} disabled={set.completed} />
+                                                                        <input type="number" className="input" style={{marginBottom:0, flex:1, height:'45px', padding:'10px', color:rColor}} placeholder={prevSet ? `Prev: ${prevSet.reps}` : '0'} value={set.reps} onChange={e => updateSet(eIndex, sIndex, 'reps', e.target.value === '' ? '' : Number(e.target.value))} disabled={set.completed} />
+                                                                        <button className="btn btn-icon" style={{width:'45px', height:'45px', padding:0, borderRadius:'12px', backgroundColor: set.completed ? 'var(--success)' : 'rgba(255,255,255,0.05)', color: set.completed ? '#000' : 'var(--text-secondary)'}} onClick={() => updateSet(eIndex, sIndex, 'completed', !set.completed)}>
+                                                                            {set.completed && <i className="fas fa-check"></i>}
+                                                                        </button>
+                                                                        <button className="btn btn-icon" style={{width:'35px', height:'45px', padding:0, borderRadius:'12px', backgroundColor:'transparent', color:'var(--danger)'}} onClick={() => removeSet(eIndex, sIndex)}>
+                                                                            <i className="fas fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                            <div style={{display:'flex', gap:'10px', marginTop:'16px'}}>
+                                                                <button className="btn btn-secondary" style={{flex:1, backgroundColor:'rgba(234, 179, 8, 0.1)', color:'#eab308'}} onClick={() => addWarmup(eIndex)}>+ Warmup</button>
+                                                                <button className="btn btn-secondary" style={{flex:1}} onClick={() => addSet(eIndex)}>+ Add Set</button>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div>
+                                                <div className="card">
+                                                    <h3>Add Exercise</h3>
+                                                    <div style={{maxHeight:'300px', overflowY:'auto', marginBottom:'20px', paddingRight:'10px'}}>
+                                                        {categories.map(cat => {
+                                                            const catEx = exercises.filter(e => e.category === cat);
+                                                            if (catEx.length === 0) return null;
+                                                            return (
+                                                                <div key={cat} style={{marginBottom:'16px'}}>
+                                                                    <div style={{fontSize:'12px', color:'var(--text-secondary)', marginBottom:'8px', textTransform:'uppercase', letterSpacing:'1px'}}>{cat}</div>
+                                                                    <div style={{display:'flex', flexWrap:'wrap', gap:'10px'}}>
+                                                                        {catEx.map(ex => (
+                                                                            <button key={ex.id} className="btn btn-secondary btn-icon" style={{borderRadius:'16px', fontSize:'14px', padding:'8px 16px'}} onClick={() => addExercise(ex.id)}>+ {ex.name}</button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            ) : (
+                                <div className={`content animate-slide-${slideDir}`}>
+                                    <div style={{maxWidth:'600px', margin:'0 auto', textAlign:'center', marginTop:'40px'}}>
+                                        <div className="card" style={{background:'linear-gradient(135deg, rgba(192,132,252,0.1), rgba(244,114,182,0.1))', border:'1px solid rgba(192,132,252,0.2)'}}>
+                                            <h2 style={{fontSize:'24px', marginBottom:'16px', color:'var(--text)', fontWeight:800}}>No Active Session</h2>
+                                            <p style={{color:'var(--text-secondary)', marginBottom:'24px', fontSize:'15px'}}>Start a new workout session to track your sets and reps.</p>
+                                            <button className="btn btn-primary" onClick={startWorkout}>Start New Workout</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        )}
+
+                        {/* EXERCISES (LIBRARY) */}
+                        {activeTab === 'exercises' && (
+                            <div className={`content animate-slide-${slideDir}`}>
+                                <div style={{columnCount:1, columnGap:'20px', width:'100%'}}>
+                                    <div className="card" style={{breakInside:'avoid', marginBottom:'20px', display:'inline-block', width:'100%'}}>
+                                        <h3>Create Exercise</h3>
+                                        <input className="input" placeholder="Exercise Name" value={newExName} onChange={e => setNewExName(e.target.value)} />
+                                        <CustomSelect options={categories} value={newExCat} onChange={setNewExCat} />
+                                        <button className="btn btn-primary" onClick={() => { if(newExName) { setExercises([...exercises, {id: Date.now().toString(), name: newExName, category: newExCat}]); setNewExName(''); }}}>Add to Library</button>
+                                    </div>
+                                    <div className="card" style={{breakInside:'avoid', marginBottom:'20px', display:'inline-block', width:'100%'}}>
+                                        <h3>Manage Categories</h3>
+                                        <div style={{display:'flex', gap:'10px'}}>
+                                            <input className="input" style={{marginBottom:0}} placeholder="New Category" value={newCatName} onChange={e => setNewCatName(e.target.value)} />
+                                            <button className="btn btn-primary" style={{width:'auto', padding:'0 20px'}} onClick={() => { if(newCatName && !categories.includes(newCatName)) { setCategories([...categories, newCatName]); setNewExCat(newCatName); setNewCatName(''); }}}>Add</button>
+                                        </div>
+                                        <div style={{marginTop:'15px', display:'flex', flexWrap:'wrap', gap:'8px'}}>
+                                            {categories.map(cat => (
+                                                <span key={cat} className="badge" style={{display:'flex', alignItems:'center', gap:'8px', padding:'6px 12px'}}>
+                                                    {cat}
+                                                    <button style={{background:'none', border:'none', color:'var(--danger)', cursor:'pointer', fontSize:'16px', lineHeight:1}} onClick={() => { if(confirm(`Remove category "${cat}"?`)) setCategories(categories.filter(c => c !== cat)); }}>&times;</button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {categories.map(cat => {
+                                        const catEx = exercises.filter(t => t.category === cat);
+                                        if (catEx.length === 0) return null;
+                                        return (
+                                            <div key={cat} className="card" style={{padding:'16px 24px', breakInside:'avoid', marginBottom:'20px', display:'inline-block', width:'100%'}}>
+                                                <h3 style={{color:'var(--accent)', fontSize:'18px', marginBottom:'16px'}}>{cat}</h3>
+                                                {catEx.map((ex, i) => (
+                                                    <div key={ex.id} style={{padding:'12px 0', borderBottom: i < catEx.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'}}>
+                                                        {editingEx?.id === ex.id ? (
+                                                            <div style={{display:'flex', gap:'10px', flexDirection:'column'}}>
+                                                                <input className="input" style={{marginBottom:0}} value={editingEx.name} onChange={e => setEditingEx({...editingEx, name: e.target.value})} />
+                                                                <CustomSelect options={categories} value={editingEx.category} onChange={c => setEditingEx({...editingEx, category: c})} />
+                                                                <div style={{display:'flex', gap:'10px'}}>
+                                                                    <button className="btn btn-success" style={{padding:'8px'}} onClick={() => { setExercises(exercises.map(e => e.id === ex.id ? editingEx : e)); setEditingEx(null); }}>Save</button>
+                                                                    <button className="btn btn-secondary" style={{padding:'8px'}} onClick={() => setEditingEx(null)}>Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex-between">
+                                                                <span style={{fontWeight:600, fontSize:'15px'}}>{ex.name}</span>
+                                                                <div style={{display:'flex', gap:'8px'}}>
+                                                                    <button className="btn btn-secondary btn-icon" style={{padding:'6px 12px', fontSize:'12px'}} onClick={() => setEditingEx(ex)}>Edit</button>
+                                                                    <button className="btn btn-danger btn-icon" style={{padding:'6px 12px', fontSize:'12px', background:'transparent', border:'1px solid rgba(244,63,94,0.3)'}} onClick={() => { if(confirm(`Delete ${ex.name}?`)) setExercises(exercises.filter(e => e.id !== ex.id)); }}>Del</button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    })}
+                                    
+                                    {exercises.filter(e => !categories.includes(e.category)).length > 0 && (
+                                        <div className="card" style={{padding:'16px 24px', border:'1px solid var(--danger)', breakInside:'avoid', marginBottom:'20px', display:'inline-block', width:'100%'}}>
+                                            <h3 style={{color:'var(--danger)', fontSize:'18px', marginBottom:'16px'}}>Uncategorized</h3>
+                                            {exercises.filter(e => !categories.includes(e.category)).map((ex, i, arr) => (
+                                                <div key={ex.id} style={{padding:'12px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'}}>
+                                                    <div className="flex-between">
+                                                        <span style={{fontWeight:600, fontSize:'15px'}}>{ex.name}</span>
+                                                        <div style={{display:'flex', gap:'8px'}}>
+                                                            <button className="btn btn-secondary btn-icon" style={{padding:'6px 12px', fontSize:'12px'}} onClick={() => setEditingEx(ex)}>Edit</button>
+                                                            <button className="btn btn-danger btn-icon" style={{padding:'6px 12px', fontSize:'12px'}} onClick={() => setExercises(exercises.filter(e => e.id !== ex.id))}>Del</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* HISTORY */}
+                        {activeTab === 'history' && (
+                            <div className={`content animate-slide-${slideDir}`}>
+                                <div className="dashboard-grid">
+                                    <div style={{gridColumn:'1 / -1'}}>
+                                        {history.length === 0 ? (
+                                            <div style={{textAlign:'center', color:'var(--text-secondary)', marginTop:'60px'}}>
+                                                <div style={{fontSize:'48px', marginBottom:'16px', opacity:0.5}}>🏋️‍♂️</div>
+                                                No workouts yet.<br/>Time to go crush one!
+                                            </div>
+                                        ) : (
+                                            history.map(h => (
+                                                <div key={h.id} className="card">
+                                                    <div className="flex-between" style={{marginBottom:'16px'}}>
+                                                        <h3 style={{margin:0, color:'var(--primary)'}}>{h.date}</h3>
+                                                        <span className="badge" style={{color:'var(--text)', backgroundColor:'rgba(255,255,255,0.1)', borderColor:'rgba(255,255,255,0.2)'}}>Intensity: {h.intensity}/5</span>
+                                                    </div>
+                                                    {h.notes && (
+                                                        <p style={{color:'var(--text-secondary)', fontSize:'14px', marginBottom:'20px', fontStyle:'italic', backgroundColor:'rgba(0,0,0,0.2)', padding:'12px', borderRadius:'12px'}}>"{h.notes}"</p>
+                                                    )}
+                                                    {h.feedback && (
+                                                        <div style={{backgroundColor:'rgba(16, 185, 129, 0.1)', border:'1px solid rgba(16, 185, 129, 0.2)', padding:'16px', borderRadius:'12px', marginBottom:'20px', fontSize:'14px', color:'var(--text)'}}>
+                                                            <strong style={{color:'var(--success)', display:'block', marginBottom:'8px'}}>Performance Feedback</strong>
+                                                            {h.feedback}
+                                                        </div>
+                                                    )}
+                                                    <div style={{backgroundColor:'rgba(0,0,0,0.2)', padding:'16px', borderRadius:'16px', border:'1px solid rgba(255,255,255,0.03)'}}>
+                                                        {h.exercises.map((ex, i) => (
+                                                            <div key={i} className="flex-between" style={{marginBottom: i < h.exercises.length - 1 ? '12px' : '0'}}>
+                                                                <strong style={{fontSize:'15px'}}>{exercises.find(e => e.id === ex.exerciseId)?.name || 'Unknown'}</strong>
+                                                                <span style={{color:'var(--text-secondary)', fontSize:'13px', fontWeight:600}}>{ex.sets.filter(s => s.completed).length} sets</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <button className="btn btn-danger" style={{marginTop:'20px', padding:'12px'}} onClick={() => setHistory(history.filter(hist => hist.id !== h.id))}>Delete Log</button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="bottom-nav">
+                        <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => switchTab('home')}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2ma1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Home
+                        </button>
+                        <button className={`nav-item ${activeTab === 'workout' ? 'active' : ''}`} onClick={() => switchTab('workout')}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Workout
+                        </button>
+                        <button className={`nav-item ${activeTab === 'exercises' ? 'active' : ''}`} onClick={() => switchTab('exercises')}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg> Library
+                        </button>
+                        <button className={`nav-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => switchTab('history')}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> History
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
